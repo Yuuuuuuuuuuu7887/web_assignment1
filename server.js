@@ -9,8 +9,22 @@ const SERVER2_URL = process.env.SERVER2_URL;
 const logToken = process.env.LOG_API_TOKEN;
 const app = express();
 app.use(express.json());
-app.use(cors()); // บอกให้ Server อนุญาตการเชื่อมต่อ
-const PORT = process.env.PORT;
+
+const allowedOrigins = [
+  'http://localhost:3000',      // อนุญาตเครื่องตัวเอง (Local Dev)
+  process.env.CORS_ORIGIN       // อนุญาตเว็บ Frontend บน Vercel (อ่านค่าจาก Vercel ENV)
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // อนุญาตถ้า Origin อยู่ใน List หรือถ้าเป็นการเรียกตรง (ไม่มี Origin)
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Origin '${origin}' Not allowed by CORS`));
+    }
+  }
+}));
 
 //สร้างฟังก์ชัน async เพื่อเรียก API
 async function fetchData1() {
