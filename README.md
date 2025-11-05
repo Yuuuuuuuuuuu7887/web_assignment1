@@ -39,15 +39,15 @@
 
 //URL ของ Server 1 (ที่เก็บข้อมูล Config)
 
-SERVER1_URL="https://script.google.com/macros/s/AKfycbzwclqJRodyVjzYyY-NTQDb9cWG6Hoc5vGAABVtr5-jPA_ET_2IasrAJK4aeo5XoONiaA/exec"
+SERVER1_URL="{URLServer 1}"
 
 //URL ของ Server 2 (ที่เก็บข้อมูล Logs)
 
-SERVER2_URL="https://app-tracking.pockethost.io/api/collections/drone_logs/records"
+SERVER2_URL="{URLServer2}"
 
 //Token สำหรับยืนยันตัวตนกับ Server 2
 
-LOG_API_TOKEN="20250901efx"
+LOG_API_TOKEN="TOKEN"
 
 //Port ที่ Server นี้จะรัน
 
@@ -64,6 +64,7 @@ node server.js
 7.ใช้ GET โดย /logs/{droneId} เพื่อขอข้อมูลที่ไอดีนั้นๆจาห Server2 และทำ pagination และเรียงลำดับ http://localhost:8080/configs/66010675
 
 8.ใช้ POST โดยเข้าไปที่ Bruno แล้วใส่ URL /logs โดย http://localhost:8080/logs และใส่ข้อมูล drone_id,drone_name,country,celsius เพื่อส่งข้อมูลไปให้server2
+
 
 
 
