@@ -10,7 +10,7 @@ const logToken = process.env.LOG_API_TOKEN;
 const app = express();
 app.use(express.json());
 app.use(cors()); // บอกให้ Server อนุญาตการเชื่อมต่อ
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT;
 
 //สร้างฟังก์ชัน async เพื่อเรียก API
 async function fetchData1() {
@@ -187,16 +187,14 @@ app.get("/logs/:droneId", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch drone configuration" });
   }
 });
-/**
- * POST /logs
- * สร้าง Log ใหม่
- */
+// POST /logs
+
 app.post("/logs", async (req, res) => {
   try {
-    // 1. ดึงข้อมูลจาก Request Body (ที่ user ส่งมา)
+    //ดึงข้อมูลจาก Request Body (ที่ user ส่งมา)
     const { drone_id, drone_name, country, celsius } = req.body;
 
-    // 2. กรองข้อมูลเฉพาะที่โจทย์ต้องการส่งไป Server 2
+    // กรองข้อมูลเฉพาะที่โจทย์ต้องการส่งไป Server 2
     const newLogData = {
       drone_id,
       drone_name,
@@ -209,18 +207,18 @@ app.post("/logs", async (req, res) => {
       return res.status(400).json({ error: 'Missing required log data' });
     }
 
-    // 3. สร้าง Headers สำหรับ Server 2
+    //สร้าง Headers สำหรับ Server 2
     const authHeaders = {
       Authorization: `Bearer ${logToken}`,
       "Content-Type": "application/json"
     };
 
-    // 4. ยิง POST ไปยัง Server 2 (Drone Log Server)
+    //ยิง POST ไปยัง Server 2 (Drone Log Server)
     const response = await axios.post(SERVER2_URL, newLogData, {
       headers: authHeaders
     });
 
-    // 5. ส่งข้อมูลที่ Server 2 สร้างเสร็จ (มี id, created) กลับไป
+    //ส่งข้อมูลที่ Server 2 สร้างเสร็จ (มี id, created) กลับไป
     // ใช้ .status(201) หมายถึง "Created" (สร้างสำเร็จ)
     res.status(201).json(response.data);
 
