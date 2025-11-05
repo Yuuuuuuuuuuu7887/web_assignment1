@@ -23,20 +23,20 @@
 
 1.ไปที่ URL https://assignment1-xi-gold.vercel.app/
 
-2.ใช้ GET โดย /configs/{droneId} เพื่อขอข้อมูลที่ไอดีนั้นๆจาก Server1 https://assignment1-xi-gold.vercel.app/configs/66010675
+2.ใช้ GET โดย `/configs/{droneId}` เพื่อขอข้อมูลที่ไอดีนั้นๆจาก Server1 https://assignment1-xi-gold.vercel.app/configs/66010675
 
-3.ใช้ GET โดย /status/{droneId} เพื่อขอข้อมูลที่ไอดีนั้นๆจาก Server1 ให้มีเฉพาะ condition https://assignment1-xi-gold.vercel.app/configs/66010675
+3.ใช้ GET โดย `/status/{droneId}` เพื่อขอข้อมูลที่ไอดีนั้นๆจาก Server1 ให้มีเฉพาะ condition https://assignment1-xi-gold.vercel.app/configs/66010675
 
-4.ใช้ GET โดย /logs/{droneId} เพื่อขอข้อมูลที่ไอดีนั้นๆจาก Server2 และทำ pagination และเรียงลำดับ https://assignment1-xi-gold.vercel.app/configs/66010675
+4.ใช้ GET โดย `/logs/{droneId}` เพื่อขอข้อมูลที่ไอดีนั้นๆจาก Server2 และทำ pagination และเรียงลำดับ https://assignment1-xi-gold.vercel.app/configs/66010675
 
-5.ใช้ POST โดยเข้าไปที่ Bruno แล้วใส่ URL /logs โดย https://assignment1-xi-gold.vercel.app/logs และใส่ข้อมูล drone_id,drone_name,country,celsius เพื่อส่งข้อมูลไปให้server2
+5.ใช้ POST โดยเข้าไปที่ Bruno แล้วใส่ URL `/logs` โดย https://assignment1-xi-gold.vercel.app/logs และใส่ข้อมูล drone_id,drone_name,country,celsius เพื่อส่งข้อมูลไปให้server2
 
 ### วิธีการใช้งาน(localhost)
 
 1.Clone โปรเจกต์นี้ลงมา
 2.ติดตั้ง npm install
 3.สร้างไฟล์ .env
-
+```
 //URL ของ Server 1 (ที่เก็บข้อมูล Config)
 
 SERVER1_URL="{URLServer 1}"
@@ -52,18 +52,19 @@ LOG_API_TOKEN="TOKEN"
 //Port ที่ Server นี้จะรัน
 
 PORT=8080
-
+```
 4.รันเซิร์ฟเวอร์
-node server.js
+`node server.js`
 เซิร์ฟเวอร์จะทำงานที่ http://localhost:8080
 
-5.ใช้ GET โดย /configs/{droneId} เพื่อขอข้อมูลที่ไอดีนั้นๆจาห Server1 http://localhost:8080/configs/66010675
+5.ใช้ GET โดย `/configs/{droneId}` เพื่อขอข้อมูลที่ไอดีนั้นๆจาก Server1 http://localhost:8080/configs/66010675
 
-6.ใช้ GET โดย /status/{droneId} เพื่อขอข้อมูลที่ไอดีนั้นๆจาห Server1 ให้มีเฉพาะ condition http://localhost:8080/configs/66010675
+6.ใช้ GET โดย `/status/{droneId}` เพื่อขอข้อมูลที่ไอดีนั้นๆจาก Server1 ให้มีเฉพาะ condition http://localhost:8080/configs/66010675
 
-7.ใช้ GET โดย /logs/{droneId} เพื่อขอข้อมูลที่ไอดีนั้นๆจาห Server2 และทำ pagination และเรียงลำดับ http://localhost:8080/configs/66010675
+7.ใช้ GET โดย `/logs/{droneId}` เพื่อขอข้อมูลที่ไอดีนั้นๆจาก Server2 และทำ pagination และเรียงลำดับ http://localhost:8080/configs/66010675
 
-8.ใช้ POST โดยเข้าไปที่ Bruno แล้วใส่ URL /logs โดย http://localhost:8080/logs และใส่ข้อมูล drone_id,drone_name,country,celsius เพื่อส่งข้อมูลไปให้server2
+8.ใช้ POST โดยเข้าไปที่ Bruno แล้วใส่ URL `/logs` โดย http://localhost:8080/logs และใส่ข้อมูล drone_id,drone_name,country,celsius เพื่อส่งข้อมูลไปให้server2
+
 
 
 
