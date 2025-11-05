@@ -1,234 +1,163 @@
-//โหลด library
-require("dotenv").config();
-const axios = require("axios");
-const express = require('express');
-const cors = require('cors');
-//ดึง URL มาจาก process.env
-const SERVER1_URL = process.env.SERVER1_URL;
-const SERVER2_URL = process.env.SERVER2_URL;
-const logToken = process.env.LOG_API_TOKEN;
-const app = express();
-app.use(express.json());
-app.use(cors()); // บอกให้ Server อนุญาตการเชื่อมต่อ
-const PORT = process.env.PORT;
+// ✅ ใช้ ES Module แบบเดียวทั้งหมด
+import express from "express"
+import cors from "cors"
+import axios from "axios"
+import dotenv from "dotenv"
 
-//สร้างฟังก์ชัน async เพื่อเรียก API
-async function fetchData1() {
-  // ตรวจสอบว่า .env โหลดมาถูกหรือไม่
-  if (!SERVER1_URL) {
-    console.error("Error: CONFIG_SERVER_URL is not defined.");
-    console.log("Did you forget to create a .env file?");
-    return;
+dotenv.config()
+
+const app = express()
+
+// ✅ ให้ Express อ่าน JSON
+app.use(express.json())
+
+// ✅ เปิดใช้งาน CORS แบบ global
+app.use(cors())
+
+// ✅ ป้องกัน preflight error (บางครั้ง Vercel ไม่ตอบ OPTIONS)
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*") // หรือระบุ frontend ก็ได้
+  res.setHeader("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
+  if (req.method === "OPTIONS") {
+    return res.status(200).end()
   }
+  next()
+})
 
-  console.log(`Connecting to: ${SERVER1_URL}`);
+// ✅ โหลดค่าจาก .env
+const SERVER1_URL = process.env.SERVER1_URL
+const SERVER2_URL = process.env.SERVER2_URL
+const logToken = process.env.LOG_API_TOKEN
+const PORT = process.env.PORT || 3000
+
+// ✅ ฟังก์ชันดึงข้อมูลจาก Server 1
+async function fetchData1() {
+  if (!SERVER1_URL) {
+    console.error("❌ Missing SERVER1_URL in .env")
+    return []
+  }
 
   try {
-    const response1 = await axios.get(SERVER1_URL);
-
-    //แสดงผลข้อมูลที่ได้
-    // console.log("--- Data Received ---");
-    console.log(response1.data); // .data คือส่วนเนื้อหา (body) ที่ API ส่งกลับมา
-    console.log(`Successfully fetched ${response1.data.data.length} records.`);
-    return response1.data.data;
+    const response1 = await axios.get(SERVER1_URL)
+    console.log(`✅ Fetched ${response1.data.data.length} configs from SERVER1`)
+    return response1.data.data
   } catch (error) {
-    //จัดการ Error หากเชื่อมต่อล้มเหลว
-    console.error("Error fetching data:", error.message);
+    console.error("Error fetching data:", error.message)
+    return []
   }
-
 }
 
-function runserver2() {
-  // สร้าง Header สำหรับยืนยันตัวตน
-  // ใช้ object นี้ในทุก request ที่ส่งไป Server 2
-  const authHeaders = {
-    Authorization: `Bearer ${logToken}`,
-  };
-  // List/Search Records (GET)
-
-  async function listLogs() {
-    console.log("1. Testing GET /records (List/Search)");
-
-    if (!SERVER2_URL || !logToken) {
-      console.error("Missing LOG_SERVER_URL or LOG_API_TOKEN in .env");
-      return;
-    }
-
-    try {
-      // เวลาใช้ axios.get() เราจะส่ง config (ที่มี headers) เป็น argument ที่ 2
-      const response2 = await axios.get(SERVER2_URL, {
-        headers: authHeaders,
-        params: {
-          // ลองเพิ่ม query params ตามเอกสาร PocketBase
-          page: 1,
-          perPage: 5,
-          sort: "-created", // เรียงจากใหม่สุด
-        },
-      });
-
-      console.log("Successfully listed records:");
-      console.log("Total items:", response2.data.totalItems);
-      // console.log("Showing items:", response2.data.items.length);
-      // console.log("First item:", response2.data.items[0]); // แสดงแค่รายการแรก
-      return response2.data.items;
-    } catch (error) {
-      console.error("Error listing logs:", error.message);
-    }
-  }
-
-  async function main() {
-    await listLogs();
-  }
-  main();
-}
-const test=fetchData1();
-
-// runserver2();
+// ✅ ดึง config ตาม droneId
 app.get("/configs/:droneId", async (req, res) => {
   try {
-    //รับ input 'droneId' จาก URL
-    // เช่น /configs/3001 droneId จะเป็น "3001"
-    const { droneId } = req.params;
-    const allConfigs = await fetchData1();
+    const { droneId } = req.params
+    const allConfigs = await fetchData1()
 
-    //ค้นหา config เฉพาะของ drone id นั้น
-    const droneConfig = allConfigs.find(
-      (config) => config.drone_id == droneId
-    );
-
+    const droneConfig = allConfigs.find((c) => c.drone_id == droneId)
     if (!droneConfig) {
-      return res.status(404).json({ error: "Drone config not found" });
+      return res.status(404).json({ error: "Drone config not found" })
     }
 
-    // กรองข้อมูลเฉพาะ field ที่โจทย์ต้องการ
     const result = {
       drone_id: droneConfig.drone_id,
       drone_name: droneConfig.drone_name,
       light: droneConfig.light,
       country: droneConfig.country,
       weight: droneConfig.weight,
-    };
-
-    //ส่ง response (JSON) กลับไป
-    res.json(result);
-  } catch (error) {
-    // จัดการ Error หาก Server 1 มีปัญหา หรือโค้ดเราพัง
-    console.error("Error fetching drone config:", error.message);
-    res.status(500).json({ error: "Failed to fetch drone configuration" });
-  }
-});
-
-app.get("/status/:droneId", async (req, res) => {
-  try {
-    //รับ input 'droneId' จาก URL
-    // เช่น /configs/3001 droneId จะเป็น "3001"
-    const { droneId } = req.params;
-    const allConfigs = await fetchData1();
-
-    //ค้นหา config เฉพาะของ drone id นั้น
-    const droneConfig = allConfigs.find(
-      (config) => config.drone_id == droneId
-    );
-
-    if (!droneConfig) {
-      return res.status(404).json({ error: "Drone config not found" });
     }
 
-    // กรองข้อมูลเฉพาะ field ที่โจทย์ต้องการ
-    const result = {
-      condition: droneConfig.condition,
-    };
-
-    //ส่ง response (JSON) กลับไป
-    res.json(result);
+    res.json(result)
   } catch (error) {
-    // จัดการ Error หาก Server 1 มีปัญหา หรือโค้ดเราพัง
-    console.error("Error fetching drone config:", error.message);
-    res.status(500).json({ error: "Failed to fetch drone configuration" });
+    console.error("Error fetching drone config:", error.message)
+    res.status(500).json({ error: "Failed to fetch drone configuration" })
   }
-});
+})
 
+// ✅ ดึงสถานะ
+app.get("/status/:droneId", async (req, res) => {
+  try {
+    const { droneId } = req.params
+    const allConfigs = await fetchData1()
+    const droneConfig = allConfigs.find((c) => c.drone_id == droneId)
+    if (!droneConfig) {
+      return res.status(404).json({ error: "Drone config not found" })
+    }
+
+    res.json({ condition: droneConfig.condition })
+  } catch (error) {
+    console.error("Error fetching drone status:", error.message)
+    res.status(500).json({ error: "Failed to fetch drone status" })
+  }
+})
+
+// ✅ ดึง logs ของ drone
 app.get("/logs/:droneId", async (req, res) => {
   try {
-    //รับ input 'droneId' จาก URL
-    // เช่น /configs/3001 droneId จะเป็น "3001"
-    const { droneId } = req.params;
-    // 1. ดึงค่า page จาก query string, ถ้าไม่ส่งมาให้เป็น 1
-    const page = req.query.page || 1;
+    const { droneId } = req.params
+    const page = req.query.page || 1
+
     const authHeaders = {
       Authorization: `Bearer ${logToken}`,
-    };
+    }
+
     const response = await axios.get(SERVER2_URL, {
       headers: authHeaders,
       params: {
         filter: `(drone_id = ${droneId})`,
         perPage: 12,
         sort: "-created",
-        fields: 'drone_id,drone_name,created,country,celsius',
-        page: page
-      }
-    });
+        fields: "drone_id,drone_name,created,country,celsius",
+        page,
+      },
+    })
 
-    const rawItems = response.data.items || [];
-
-    const orderedItems = rawItems.map(item => ({
-      // จัดเรียง Key ตามลำดับที่ต้องการ: drone_id, drone_name, created, country, celsius
+    const orderedItems = (response.data.items || []).map((item) => ({
       drone_id: item.drone_id,
       drone_name: item.drone_name,
       created: item.created,
       country: item.country,
       celsius: item.celsius,
-    }));
+    }))
 
-    res.json(orderedItems);
+    res.json(orderedItems)
   } catch (error) {
-    // จัดการ Error หาก Server 1 มีปัญหา หรือโค้ดเราพัง
-    console.error("Error fetching drone config:", error.message);
-    res.status(500).json({ error: "Failed to fetch drone configuration" });
+    console.error("Error fetching logs:", error.message)
+    res.status(500).json({ error: "Failed to fetch logs" })
   }
-});
-// POST /logs
+})
 
+// ✅ เพิ่ม log ใหม่
 app.post("/logs", async (req, res) => {
   try {
-    //ดึงข้อมูลจาก Request Body (ที่ user ส่งมา)
-    const { drone_id, drone_name, country, celsius } = req.body;
+    const { drone_id, drone_name, country, celsius } = req.body
 
-    // กรองข้อมูลเฉพาะที่โจทย์ต้องการส่งไป Server 2
-    const newLogData = {
-      drone_id,
-      drone_name,
-      country,
-      celsius
-    };
-
-    // (Optional) ตรวจสอบว่าข้อมูลจำเป็นครบหรือไม่
     if (!drone_id || !drone_name || !country || celsius === undefined) {
-      return res.status(400).json({ error: 'Missing required log data' });
+      return res.status(400).json({ error: "Missing required log data" })
     }
 
-    //สร้าง Headers สำหรับ Server 2
     const authHeaders = {
       Authorization: `Bearer ${logToken}`,
-      "Content-Type": "application/json"
-    };
+      "Content-Type": "application/json",
+    }
 
-    //ยิง POST ไปยัง Server 2 (Drone Log Server)
-    const response = await axios.post(SERVER2_URL, newLogData, {
-      headers: authHeaders
-    });
+    const response = await axios.post(
+      SERVER2_URL,
+      { drone_id, drone_name, country, celsius },
+      { headers: authHeaders }
+    )
 
-    //ส่งข้อมูลที่ Server 2 สร้างเสร็จ (มี id, created) กลับไป
-    // ใช้ .status(201) หมายถึง "Created" (สร้างสำเร็จ)
-    res.status(201).json(response.data);
-
+    res.status(201).json(response.data)
   } catch (error) {
-    // จัดการ Error (เช่น ส่งข้อมูลไม่ครบ หรือ Server 2 พัง)
-    console.error("Error creating drone log:", error.response ? error.response.data : error.message);
-    res.status(500).json({ error: "Failed to create drone log" });
+    console.error(
+      "Error creating log:",
+      error.response ? error.response.data : error.message
+    )
+    res.status(500).json({ error: "Failed to create log" })
   }
-});
+})
 
-app.listen(PORT, () => {
-  console.log(`Server is running on ${PORT}`);
-});
+// ✅ run server (local เท่านั้น)
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`))
+
+export default app
