@@ -50,6 +50,7 @@ SERVER2_URL="https://app-tracking.pockethost.io/api/collections/drone_logs/recor
 LOG_API_TOKEN="20250901efx"
 
 //Port ที่ Server นี้จะรัน
+
 PORT=8080
 
 4.รันเซิร์ฟเวอร์
@@ -63,6 +64,7 @@ node server.js
 7.ใช้ GET โดย /logs/{droneId} เพื่อขอข้อมูลที่ไอดีนั้นๆจาห Server2 และทำ pagination และเรียงลำดับ http://localhost:8080/configs/66010675
 
 8.ใช้ POST โดยเข้าไปที่ Bruno แล้วใส่ URL /logs โดย http://localhost:8080/logs และใส่ข้อมูล drone_id,drone_name,country,celsius เพื่อส่งข้อมูลไปให้server2
+
 
 
 
