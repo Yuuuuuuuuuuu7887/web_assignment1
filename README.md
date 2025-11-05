@@ -55,9 +55,10 @@ node server.js
 
 5.ใช้ GET โดย /configs/{droneId} เพื่อขอข้อมูลที่ไอดีนั้นๆจาห Server1 http://localhost:8080/configs/66010675
 
-ุุ6.ใช้ GET โดย /status/{droneId} เพื่อขอข้อมูลที่ไอดีนั้นๆจาห Server1 ให้มีเฉพาะ condition http://localhost:8080/configs/66010675
+6.ใช้ GET โดย /status/{droneId} เพื่อขอข้อมูลที่ไอดีนั้นๆจาห Server1 ให้มีเฉพาะ condition http://localhost:8080/configs/66010675
 
 7.ใช้ GET โดย /logs/{droneId} เพื่อขอข้อมูลที่ไอดีนั้นๆจาห Server2 และทำ pagination และเรียงลำดับ http://localhost:8080/configs/66010675
 
 8.ใช้ POST โดยเข้าไปที่ Bruno แล้วใส่ URL /logs โดย http://localhost:8080/logs และใส่ข้อมูล drone_id,drone_name,country,celsius เพื่อส่งข้อมูลไปให้server2
+
 
