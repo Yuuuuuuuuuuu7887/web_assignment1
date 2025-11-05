@@ -13,11 +13,11 @@
 
 
 ### เทคโนโลยีที่ใช้
--Node.js
--Express.js
--Axios (สำหรับยิง API)
--CORS (สำหรับจัดการสิทธิ์)
--Dotenv (สำหรับจัดการตัวแปร)
+- Node.js
+- Express.js
+- Axios (สำหรับยิง API)
+- CORS (สำหรับจัดการสิทธิ์)
+- Dotenv (สำหรับจัดการตัวแปร)
 
 ### วิธีการใช้งาน(cloud)
 
@@ -64,6 +64,7 @@ PORT=8080
 7.ใช้ GET โดย `/logs/{droneId}` เพื่อขอข้อมูลที่ไอดีนั้นๆจาก Server2 และทำ pagination และเรียงลำดับ http://localhost:8080/configs/66010675
 
 8.ใช้ POST โดยเข้าไปที่ Bruno แล้วใส่ URL `/logs` โดย http://localhost:8080/logs และใส่ข้อมูล drone_id,drone_name,country,celsius เพื่อส่งข้อมูลไปให้server2
+
 
 
 
